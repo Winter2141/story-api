@@ -8,6 +8,7 @@ use App\Models\Story;
 use App\Models\UserStoryRelation;
 use App\Services\Interfaces\StoryService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class StoryServiceImpl implements StoryService
 {
@@ -43,16 +44,38 @@ class StoryServiceImpl implements StoryService
     {
         $user = Auth::user();
         $params['user_id'] = $user->id;
+        Log::debug("CREATE::::", [$user, $params]);
         $story = Story::query()->create($params);
         $relation_params['story_id'] = $story->id;
         $relation_params['user_id'] = $user->id;
         UserStoryRelation::query()->create($relation_params);
-
+        if(isset($params['relations'])) {
+            $this->updateRelations($params['relations'], $story);
+        }
         return $story;
+    }
+
+    public function updateRelations($params, Story $story)
+    {
+        if(is_array($params) && count($params))
+        {
+            foreach ($params as $param)
+            {
+                if(!UserStoryRelation::query()->where('story_id', $story->id)->where('user_id', $param)->exists()) {
+                    $relation_params['story_id'] = $story->id;
+                    $relation_params['user_id'] = $param;
+                    UserStoryRelation::query()->create($relation_params);
+                }
+            }
+            UserStoryRelation::query()->whereNotIn("user_id", $params)->where("user_id", "<>", $story->user_id)->delete();
+        }
     }
 
     public function doUpdate($params, Story $story)
     {
+        if(isset($params['relations'])) {
+            $this->updateRelations($params['relations'], $story);
+        }
         return $story->update($params);
     }
 
