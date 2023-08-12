@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StoryController;
+use App\Http\Controllers\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -17,12 +18,16 @@ use App\Http\Controllers\StoryController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function() {
    Route::controller(StoryController::class)->name("story.")->prefix("story")->group(function() {
-      Route::post("/list", "storyList");
+        Route::post("/list", "index");
+        Route::get("/{story}", "show");
+       Route::post("/", "store");
+       Route::put("/{story}", "update");
+       Route::delete("/{story}", "destroy");
    });
-});
-Route::controller(StoryController::class)->name("story.")->prefix("story")->group(function() {
-    Route::post("/list", "storyList");
+    Route::post('/logout', [AuthController::class, 'logout']);
 });

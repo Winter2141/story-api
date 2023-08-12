@@ -22,4 +22,9 @@ class Story extends Model
     {
         return $this->belongsTo(User::class, "user_id");
     }
+
+    public function user_relations()
+    {
+        return $this->hasMany(UserStoryRelation::class, 'story_id');
+    }
 }

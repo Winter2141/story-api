@@ -12,4 +12,5 @@ interface StoryService
     public function doCreate($params);
     public function doUpdate($params, Story $story);
     public function doDelete(Story $story);
+    public function findById(Story $story);
 }

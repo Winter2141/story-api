@@ -21,7 +21,7 @@ class StoryFactory extends Factory
         return [
             "user_id" => fake()->randomElement($users),
             "title" => fake()->jobTitle(),
-            "content" => fake()->randomHtml(10, 10),
+            "content" => fake()->paragraphs(5, true),
             "status" => fake()->biasedNumberBetween(1, 2)
         ];
     }
